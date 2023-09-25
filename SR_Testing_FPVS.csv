@@ -1,0 +1,48 @@
+﻿Observer_ID,Date (XPMAN),Task Order,Handed,Gender,Age,Label,Bad Channels,Lab_criteria,Viewing Distance,impedances (aim is <25),,General notes (Notes are copied from grey notebook).,Notes Catsel,Notes Duty Cycle,Notes Oddballfreq,,,,,
+AN11AN24,2021-08-05,CDO,R,M,36,Control,,,70,"all <30, F5 & F6 & F7 & F8 ca. 30 ",,,Base f visible in raw EEG!,looks like a lot of temporal beta activity at T7 and T8,"PO4 started to develop like noise, fixed prior to start of sweep",,,,,
+CH15PE11,2021-08-05,OCD,R,M,28,Control,,,70,all <20 (CP4 is at ca. 21),,Some weird line noise; maybe a machine in hospital? -> one with REF_AF7 though. ,FC3 had a couple weird resets,"Blinking a lot again, good signal though","Blinking a lot, but good signal",,,,,
+CI21LE06,2021-08-05,CDO,R,F,26,Control,,,70,all <20 ,,"In general, very high activity at T7 & T8  temporal electrodes, relative to rest of data, localized & bilateral, no impedance issue.
+Lots of hair & I think visible HR, may need to do ICA on this.",,,,,,,,
+ER10GE09,2021-08-10,ODC,L,F,48,Control,,,70,30-40,,"Impedances a bit high on most channels. Lots of haird, couldn’t improve it much",,,"Very quiet, when referenced, but same weird line noise as prev. sub. Probably from cafeteria",,,,,
+MA27IT02,2021-08-10,ODC,L,M,41,Control,,,70,NA,,Motor from kitchen running in bg. Might be adding noise. Was vibrating stuff in the room. Lots of shifting in chair,,,Restarted once from missed 254. FC3 doing weird stuff,,,,,
+AN14RA27,2021-08-20,OCD,R,F,24,Control,,,70,30-40,,"Spent a solid 20 min trying to get impedances down, couldn’t get much below 30-40.
+A bit spiky on temporal polers, but otherwise VERY clean looking signals","Tried to fix FC6 & C6, I think it's either too much hair or much spiking activity (looks similar to FT8)","Lots more blinking, but spiking activity seems reduced","All good, not many blinks or saccades. Developed some spiking activity over FCG & C6",,,,,
+IL13EA29,2021-10-27,DOC,R,F,58,Control_validation,,0/3,70,NA,,"Slightly high impedances on frontal and FC electrodes, but none above 30 mV",,,,,,,,
+CA27EY11,2022-01-29,ODC,R,M,37,Control,"(this subject has been tested twice, also 2021-08-03)",,70,,,"EOG electrode all maybe affected -> FFP2 wedring
+-> generally sig line noise when interferenced",,,,,,,,
+DE02RD13,2022-01-29,OCD,R,M,60,Control,P3,,70,,,P2 has bridging artifact ( maybe 200 mV amplitude),Laughed at the end of trial 2,"A few DC resets of C, P & CP electrodes. Still getting 1-3 missed frames on trials (port code 66)","No problems with recording, but a few missed frame instances (code 66)",,,,,
+FA15IL17,2021-07-24,CDO,R,M,31,Exclude,,,70,NA,,,"- Requested frequency: 5.9948, but was rounded to 5.9949;
+- Trial #2 Saving failed (in presented order)","- Requested Duty cycle 50.00 ms, actual changed to 50.06 ms",Missing first base after each oddball (port code omission),,,,,
+LY26KE16,2021-07-24,CDO,R,F,NA,Exclude,,,70,NA,,,"-Check if Exp. Base images contain houses (check stim sizes) (trial 6; rand)
+- trials 7 & 8 same base set
+- need to confirm base images
+- need to add CB for order of face/house (Pilot S's 3&4 should do house then face)","-Check Key-start of trials (enable key press)
+- check stim sizes",,,,,,
+MA10EO29,2021-07-31,DCO,R,M,30,Exclude,,,70,"all <20, except PO4 & CPz (both <30)",,,"Requested frequency was set to 5.99, changed to 5.98",'Requested frequency set to 0.99 instead of 9.99 -> was fixed back to 9.99,"No issues, new port coddes worked",,,,,
+IN29DO17,2021-10-18,OCD,R,M,NA,Exclude,,,70,"all withing 20 mV, very nice",,"Substantial line noise (were next to like 100 outlets on the waöö- ref'd to AF7 for line viewing, line noise was 100% gone. -> F5 &/, F6&8 showed slight spiking activity only during 3 (duty cycle)",,,,,,,,
+VI29IL09,2023-03-07,,R,M,28,Control_validation,,0/3,70,,,,,,,,,,,
+RE07NG19,2021-10-27,CDO,R,M,60,Exclude,"Slow wave activity trial 1,2, T7, TP7 noisy, not well attached, exclude until I know what to do with this",0/3 ,70,NA,,,"T7 still showing some more spiking activity (TP7, TP8 & T8 too); probably from glasses touching…
+also, some weird slow-wave activity on the first 2 trials.",,,,,,,
+MA07LA08,2021-10-20,DCO,R,F,41,SR1,,,70,all <20,,"Very ""thick"" hair, maybe the hair itself is fine, but there is a LOT of it. Still all <20",Recognized the repeat images in 1 (duty cycle),"Missed one trial because she ""false alarmed"" and stopped to ask what she should do. (Pressed space when black fixation cross).
+- Another trial with some very big slow waves probably missed.",All looks good here.,,,,,
+CL03NA22,2021-10-21,CDO,R,F,24,SR1,Pz,,70,NA,,Had to switch electrodes /re-gel b/c of fire alarm,,,,,,,,
+EV08IS06,2021-10-22,OCD,R,M,45,SR1,,,70,NA,,Wants raw data & bdf reader (from bisseri/actiview) -> email is in grey notebook.,"another one of those ""false alarm"" responses. A couple of missed frames (66)","No more slow waves, but a bit more alpha (hard to tell if alpha or 10Hz response). 1 more missed frame (66)",Some strange slow wave activity at front right. Super strong alpha between trials.,,,,,
+IN30LA18,2021-10-25,DOC,L,F,26,SR1,,,70,NA,,,,"All looks super good, very clean recording & very low impedances.",Mad (?),,,,,
+NA15HA29,2021-10-25,COD,R,M,50,SR1,,,87,NA,,,,,,,,,,
+SI06EL30,2021-10-28,OCD,R,M,45,SR1,P9,,70,"A few right side parietal electrodes above 20 mV after fixing, same for LHS",,,Some strange slow waves at the beginning. Claires some trouble maintaining fixation cross over B&W images hard to track,Slow waves again on trial 1. (looks like ca. 0.15 Hz maybe),Visible oddball responses on PO8 in last trial or 2,,,,,
+PE17ER18,2021-10-18,ODC,R,M,30,SR2,,1/3 (YBT),70,NA,,"Failed to send 254 port codes during 2 (dutycycle) and 3 (catsel).Toggled there off & on again, created new instances, no luck. VERY strange. -> Closed the program, reopened it, and it ran a new (clean) instance of the program, just fine (placing port codes properly).
+NB: Did not replicate when re-running same instance on test subject.",,,,,,,,
+EL31AN18,2021-10-19,COD,R,M,41,SR2,,1/3 (YBT),70,NA,,,"- PO3 got a bit noisy; fixed before starting 2 (oddballfreq), but check in recording. 
+- slow waves during EXP1 (may need beefier high-pass?). All 254/255 worked!",,PO3 looks much cleaner; fewer slow waves than during 1 (catsel). A few missed frames (port code 66),,,,,
+PE11JA02,2021-10-20,DOC,R,F,40,SR_validation,,"3/3 (ficst score 1, ybt 17, cfmt+ 91)",70,NA,,"A lot of line noise,  and rel. high impedance electrodes (lots of thick hair)",,,,,,,,
+MA23IA03,2021-10-22,ODC,R,F,47,SR_validation,,(ficst score 1),70,NA,,,,,,,,,,
+EU04EN27,2021-10-25,CDO,R,M,33,SR2,O2,1/3 (YBT),70,NA,,,O2 doing something odd. Fixed up again before starting 2 (dutycycle),"O2 much calmer, but still not terrific..",,,,,,
+SI24JA22,2021-10-25,DCO,R,F,44,SR2,"Noisy, but we can keep",1/3 (CFMT),70,NA,,,"Clearly getting tired -> lots of alpha, even at the end of 1 (dutycycle)","Lots of line noise, but completely gone with a reference (Afz). Otherwise, all good impedances. F7 has a tiny bit of (what it looks like) line noise left over after referencing.","Didn’t want coffee, what else can I do?",,,,,
+GA27NE14,2021-10-26,OCD,R,F,45,SR_validation,,"2/3 (YBT, CFMT)",70,NA,,,"Line noise still there, but all else is fine. Very few blinks",All good again,"Slight line noise, disappears on Afz referencing. Otherwise super nice impedances & tracings post-ref",,,,,
+MA03US03,2021-10-26,ODC,R,M,28,SR2,,0/3,70,NA,,,,,,,,,,
+BR28IK12,2021-10-27,COD,Ambidex.,M,56,SR_validation,,"fulfills CFMT, but YBT and FICST missing",70,NA,,,"All electrodes very nice, but clearly keratinized (bald) scalp",,,,,,,
+SI20AF03,2021-10-27,DCO,R,M,43,SR2,,0/3,70,NA,,"Cap somewhat loose in back, some line noise, but gone when Afz reference. Offsets all good. Subject has haved head (good for contact)",,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
