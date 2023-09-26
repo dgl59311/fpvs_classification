@@ -103,8 +103,8 @@ for i in range(len(conditions)):
 
 # Plot individual subject data
 plt.figure(figsize=(18*cm, 18*cm))
-plt.suptitle('Experiment 3 - 1')
-for id_ in range(9):
+plt.suptitle('Experiment 3 - 3')
+for id_ in range(18, 26):
 
     subj = results[id_]
     subj_id = subj.replace('_experiment_3.npy', '')
@@ -115,8 +115,10 @@ for id_ in range(9):
     for j in range(len(conditions)):
         if id_ < 9:
             id_pl = id_
-        else:
+        elif id_ < 18:
             id_pl = id_ - 9
+        else:
+            id_pl = id_ - 18
         plt.subplot(3, 3, id_pl + 1)
         # true data
         prc_ = np.percentile(data_[:, j, :], (25, 50, 75), axis=0)
@@ -147,4 +149,4 @@ for id_ in range(9):
 
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.3, hspace=0.3)
-plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_3_' + 'subj_1-9' + '.jpg'), dpi=500)
+plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_3_' + 'subj_19-26' + '.jpg'), dpi=500)
