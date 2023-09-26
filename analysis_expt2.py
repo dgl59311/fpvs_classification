@@ -108,6 +108,8 @@ for id_ in range(18, 26):
 
     if id_ < 9:
         id_pl = id_
+    elif id_ < 18:
+        id_pl = id_ - 9
     else:
         id_pl = id_ - 18
 
@@ -140,4 +142,4 @@ for id_ in range(18, 26):
     plt.legend(['data', 'random labels'], loc="upper right", ncol=1, fontsize=6)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.3, hspace=0.3)
-plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_2_' + 'subj_18-26' + '.jpg'), dpi=500)
+plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_2_' + 'subj_19-26' + '.jpg'), dpi=500)

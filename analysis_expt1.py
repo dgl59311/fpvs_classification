@@ -99,12 +99,12 @@ for i in range(len(conditions)):
     plt.ylim([-0.4, 2])
 
     plt.tight_layout()
-    plt.savefig(os.path.join(main_dir, 'Experiment_1_' + conditions[i] + '.jpg'), dpi=500)
+    plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_1_' + conditions[i] + '.jpg'), dpi=500)
 
 # Plot individual subject data
 plt.figure(figsize=(18*cm, 18*cm))
-plt.suptitle('Experiment 1 - 3')
-for id_ in range(18, 26):
+plt.suptitle('Experiment 1 - 2')
+for id_ in range(9, 18):
 
     subj = results[id_]
     subj_id = subj.replace('_experiment_1.npy', '')
@@ -115,6 +115,8 @@ for id_ in range(18, 26):
     for j in range(len(conditions)):
         if id_ < 9:
             id_pl = id_
+        elif id_ < 18:
+            id_pl = id_ - 9
         else:
             id_pl = id_ - 18
         plt.subplot(3, 3, id_pl + 1)
@@ -147,4 +149,4 @@ for id_ in range(18, 26):
 
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.3, hspace=0.3)
-plt.savefig(os.path.join(main_dir, 'Experiment_1_' + 'subj_18-26' + '.jpg'), dpi=500)
+plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_1_' + 'subj_10-18' + '.jpg'), dpi=500)

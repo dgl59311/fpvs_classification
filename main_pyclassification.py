@@ -16,8 +16,6 @@ from funcs.dependencies_clf import data_check, find_headers, clf_fpvs, experimen
 import matplotlib
 import matplotlib.pyplot as plt
 
-# pip install --upgrade PyQt5
-
 matplotlib.use('Qt5Agg')
 patch_sklearn()
 main_dir = os.getcwd()
@@ -61,60 +59,66 @@ demog_file = pd.read_csv('SR_Testing_FPVS.csv', index_col=0)
 # 1: Identity oddball
 # 2: Category selectivity
 # 3: Duty Cycle
-conditions, clf_files_local, id_files = experiment_info(3)
-files_ = data_check(conditions, clf_files_local)
-participants = files_.index
+for expt in range(3, 4):
 
-if len(conditions) > 2:
-    clf_model = clf_model_mc
-else:
-    clf_model = clf_model_bin
+    print('Runnin code for experiment: ', expt)
+    conditions, clf_files_local, id_files = experiment_info(expt)
+    files_ = data_check(conditions, clf_files_local)
+    participants = files_.index
+    participants[8:]
 
-# start loop
-for i in tqdm(range(len(participants))):
-    eeg_data = []
-    cat_labels = []
-    d_clf = np.zeros((repeat_n, len(conditions), len(freq_vector)))
-    sdt_clf = np.zeros((repeat_n, len(conditions), 4, len(freq_vector)))
-    d_clf_rlp = np.zeros((repeat_n, len(conditions), len(freq_vector)))
-    for j in range(len(conditions)):
-        loc_files = files_.loc[participants[i]]
-        # load data for each condition
-        data_file = h5py.File(os.path.join(clf_files_local, loc_files[conditions[j]]))
-        data_file = data_file['data'][:]
-        # get info from the .lw6 files
-        [epochs, xstart, xsteps, xlen] = find_headers(os.path.join(clf_files_local, loc_files[conditions[j]]))
-        cat_labels.append(np.ones(epochs) * j)
-        # select only the first 50 frequencies and 64 electrodes
-        eeg_data.append(data_file[0:50, :, :, :, 0:64, :])
-    eeg_data = np.concatenate(eeg_data, axis=5)
-    # transpose dimensions to trials x electrodes x frequencies
-    eeg_data = np.transpose(np.squeeze(eeg_data), (2, 1, 0))
-    cat_labels = np.concatenate(cat_labels)
-    # for "true" data
-    rep_ = 0
-    for train_i, test_i in random_sp.split(eeg_data, cat_labels):
-        results_clf = clf_fpvs(train_i, test_i, clf_model, eeg_data, cat_labels, freq_vector)
-        # returns d prime
-        # results_clf[0] = cat x sdt measure x freq
-        # results_clf[1] = cat x freq
-        sdt_clf[rep_, :, :, :] = results_clf[0]
-        d_clf[rep_, :, :] = results_clf[1]
-        rep_ = rep_ + 1
-    # save data
-    np.save(os.path.join(main_dir, 'results', participants[i] + id_files + '.npy'), d_clf)
-    np.save(os.path.join(main_dir, 'results', participants[i] + id_files + 'tp_fp_fn_tn.npy'), d_clf)
+    if len(conditions) > 2:
+        clf_model = clf_model_mc
+        print('Multiclass classification')
+    else:
+        clf_model = clf_model_bin
+        print('Binary classification')
 
-    # for random_label permutations
-    rep_rlp = 0
-    for k in range(repeat_n):
-        indices = np.random.permutation(len(cat_labels))
-        rlp_labels = cat_labels[indices]
-        for train_ri, test_ri in random_sp_rlp.split(eeg_data, rlp_labels):
-            results_clf_rlp = clf_fpvs(train_ri, test_ri, clf_model, eeg_data, rlp_labels, freq_vector)
-            d_clf_rlp[rep_rlp, :, :] = results_clf_rlp[1]
-        rep_rlp = rep_rlp + 1
+    # start loop
+    for i in tqdm(range(len(participants))):
+        eeg_data = []
+        cat_labels = []
+        d_clf = np.zeros((repeat_n, len(conditions), len(freq_vector)))
+        sdt_clf = np.zeros((repeat_n, len(conditions), 4, len(freq_vector)))
+        d_clf_rlp = np.zeros((repeat_n, len(conditions), len(freq_vector)))
+        for j in range(len(conditions)):
+            loc_files = files_.loc[participants[i]]
+            # load data for each condition
+            data_file = h5py.File(os.path.join(clf_files_local, loc_files[conditions[j]]))
+            data_file = data_file['data'][:]
+            # get info from the .lw6 files
+            [epochs, xstart, xsteps, xlen] = find_headers(os.path.join(clf_files_local, loc_files[conditions[j]]))
+            cat_labels.append(np.ones(epochs) * j)
+            # select only the first 50 frequencies and 64 electrodes
+            eeg_data.append(data_file[0:50, :, :, :, 0:64, :])
+        eeg_data = np.concatenate(eeg_data, axis=5)
+        # transpose dimensions to trials x electrodes x frequencies
+        eeg_data = np.transpose(np.squeeze(eeg_data), (2, 1, 0))
+        cat_labels = np.concatenate(cat_labels)
+        # for "true" data
+        rep_ = 0
+        for train_i, test_i in random_sp.split(eeg_data, cat_labels):
+            results_clf = clf_fpvs(train_i, test_i, clf_model, eeg_data, cat_labels, freq_vector)
+            # returns d prime
+            # results_clf[0] = cat x sdt measure x freq
+            # results_clf[1] = cat x freq
+            sdt_clf[rep_, :, :, :] = results_clf[0]
+            d_clf[rep_, :, :] = results_clf[1]
+            rep_ = rep_ + 1
+        # save data
+        np.save(os.path.join(main_dir, 'results', 'classification_data', participants[i] + id_files + '.npy'), d_clf)
+        np.save(os.path.join(main_dir, 'results', 'classification_data', participants[i] + id_files + 'tp_fp_fn_tn.npy'), d_clf)
 
-    # save data
-    np.save(os.path.join(main_dir, 'results', participants[i] + id_files + 'rlp.npy'), d_clf_rlp)
+        # for random_label permutations
+        rep_rlp = 0
+        for k in range(repeat_n):
+            indices = np.random.permutation(len(cat_labels))
+            rlp_labels = cat_labels[indices]
+            for train_ri, test_ri in random_sp_rlp.split(eeg_data, rlp_labels):
+                results_clf_rlp = clf_fpvs(train_ri, test_ri, clf_model, eeg_data, rlp_labels, freq_vector)
+                d_clf_rlp[rep_rlp, :, :] = results_clf_rlp[1]
+            rep_rlp = rep_rlp + 1
+
+        # save data
+        np.save(os.path.join(main_dir, 'results', 'classification_data', participants[i] + id_files + 'rlp.npy'), d_clf_rlp)
 

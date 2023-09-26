@@ -8,6 +8,7 @@ from sklearn.base import clone
 
 
 def experiment_info(id_experiment):
+    # get info from each experiment
     if id_experiment == 1:
         conditions = ['03Hz', '06Hz', '09Hz', '12Hz']
         dir_files = "C:/Users/gordillo/Desktop/local_fpvs/Experiment 1"
@@ -40,6 +41,7 @@ def data_check(conditions, folder):
 
 
 def find_headers(matfilepath):
+    # read info file from letswave
     header = sio.loadmat(matfilepath.replace(".mat", ".lw6"))['header']
     # number of epochs available
     epochs = header['datasize'].item()[0][0]
