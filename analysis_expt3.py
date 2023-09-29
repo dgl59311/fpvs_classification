@@ -113,7 +113,10 @@ for i in range(len(conditions)):
                  rotation=0, horizontalalignment='center', verticalalignment='center', bbox=bbox_props)
 
     plt.tight_layout()
-    plt.legend(['controls', 'SRs', 'significant w/o correction'])
+    if i == 0:
+        plt.legend(['controls', 'SRs', 'significant w/o correction'])
+    else:
+        plt.legend(['controls', 'SRs'])
     plt.xlabel('frequency')
     plt.ylabel("classifier sensitivity d'")
 
