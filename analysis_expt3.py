@@ -74,8 +74,8 @@ for i in range(len(conditions)):
     sr = filt_condition[filt_condition['group'] == 'sr']
     con_true = [control[i].mean() for i in range(1, 49)]
     sr_true = [sr[i].mean() for i in range(1, 49)]
-    eff_size_true = [pg.compute_effsize(control[i], sr[i]) for i in range(1, 49)]
-    pval_true = [pg.ttest(control[i], sr[i])['p-val'][0] for i in range(1, 49)]
+    eff_size_true = [pg.compute_effsize(sr[i], control[i]) for i in range(1, 49)]
+    pval_true = [pg.ttest(sr[i], control[i])['p-val'][0] for i in range(1, 49)]
     shuff_d = np.zeros((repetitions, len(freq_vector)))
 
     for nr in range(repetitions):
