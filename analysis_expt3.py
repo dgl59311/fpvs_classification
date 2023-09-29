@@ -20,34 +20,34 @@ conditions, clf_files_local, id_files = experiment_info(3)
 freq_vector = np.arange(0, 257, 1)
 freq_vector = freq_vector[freq_vector < 48]
 
-# colors
-pl_colors = ['r', 'b', 'g', 'm']
 # set to 1 to plot random label permuted data
 plot_perm = 0
 cm = 1/2.54  # centimeters in inches
 
-# results from experiment
-results = list(filter(lambda s: 'experiment_3.npy' in s, os.listdir(results_dir)))
-rlp = list(filter(lambda s: 'experiment_3rlp' in s, os.listdir(results_dir)))
-sdt = list(filter(lambda s: 'experiment_3tp_fp_fn_tn' in s, os.listdir(results_dir)))
+# classifiers
+conditions = ['_10100vs20100', '_1050vs10100']
 
-for id_ in range(26):
+for id_ in range(14):
+    for k in range(len(conditions)):
+        # results from experiment
+        results = list(filter(lambda s: 'experiment_3' + conditions[k] + '.npy' in s, os.listdir(results_dir)))
+        rlp = list(filter(lambda s: 'experiment_3' + conditions[k] + 'rlp' in s, os.listdir(results_dir)))
+        sdt = list(filter(lambda s: 'experiment_3' + conditions[k] + 'tp_fp_fn_tn' in s, os.listdir(results_dir)))
 
-    subj = results[id_]
-    subj_id = subj.replace('_experiment_3.npy', '')
-    data_ = np.load(os.path.join(results_dir, subj))
-    rlp_ = np.load(os.path.join(results_dir, rlp[id_]))
-    sdt_ = np.load(os.path.join(results_dir, sdt[id_]))
-    group_ = demog_file.loc[subj_id].Label
+        subj = results[id_]
+        subj_id = subj.replace('_experiment_3' + conditions[k] + '.npy', '')
+        data_ = np.load(os.path.join(results_dir, subj))
+        rlp_ = np.load(os.path.join(results_dir, rlp[id_]))
+        sdt_ = np.load(os.path.join(results_dir, sdt[id_]))
+        group_ = demog_file.loc[subj_id].Label
 
-    for j in range(len(conditions)):
         if 'Control' in group_:
             g_id = 'control'
         else:
             g_id = 'sr'
 
         # create dataframes
-        prc_ = np.percentile(data_[:, j, :], (25, 50, 75), axis=0)
+        prc_ = np.percentile(data_[:, 0, :], (25, 50, 75), axis=0)
         prc_[0] = prc_[1] - prc_[0]
         prc_[2] = prc_[2] - prc_[1]
 
@@ -55,9 +55,9 @@ for id_ in range(26):
         df_tmp.columns = freq_vector + 1
         df_tmp.index = [subj_id]
         df_tmp['group'] = g_id
-        df_tmp['condition'] = conditions[j]
+        df_tmp['condition'] = conditions[k]
 
-        if id_ == 0 and j == 0:
+        if id_ == 0 and k == 0:
             data_cat = df_tmp
         else:
             data_cat = pd.concat([data_cat, df_tmp])
@@ -66,9 +66,9 @@ data_cat.to_csv(os.path.join(main_dir, 'results', 'sensitivity', 'Experiment_3.c
 
 # get d prime confidence intervals
 for i in range(len(conditions)):
-    plt.figure(figsize=(15 * cm, 9 * cm))
+    plt.figure(figsize=(18 * cm, 13 * cm))
     plt.suptitle(conditions[i])
-    repetitions = 1000
+    repetitions = 5000
     filt_condition = data_cat[data_cat['condition'] == conditions[i]]
     control = filt_condition[filt_condition['group'] == 'control']
     sr = filt_condition[filt_condition['group'] == 'sr']
@@ -92,48 +92,72 @@ for i in range(len(conditions)):
     plt.scatter(freq_vector + 1 + 0.1, sr_true, s=30, facecolors='none', edgecolors='red')
     plt.errorbar(freq_vector + 1 + 0.1, sr_true, yerr=ci_, capsize=2, color='red', elinewidth=0.5, linewidth=0.7)
 
-    plt.legend(['controls', 'SRs'])
+    if i == 0:
+        plt.ylim([-0.4, 1.7])
+    else:
+        plt.ylim([-0.4, 2.1])
+
+    highlight_size = 0.5
+    highlight_color = 'Gray'
+    highlight_alpha = 0.3
+    significant_ = freq_vector[np.where(np.array(pval_true) < 0.05)[0]]
+    bbox_props = dict(boxstyle="square,pad=0.3", fc="white", alpha=0.7, ec="black", lw=2)
+    y_ = [1.5, 1.5, 1.1, 0.95]
+    for j in range(len(significant_)):
+        significant_y = y_[j]
+        significant_x = significant_[j] + 1
+        plt.fill_between([significant_x - highlight_size / 2, significant_x + highlight_size / 2],
+                         plt.ylim()[0], plt.ylim()[1],
+                         color=highlight_color, alpha=highlight_alpha)
+        plt.text(significant_x, significant_y, 'cohen d = ' + str(eff_size_true[significant_[i - 1]].round(1)),
+                 rotation=0, horizontalalignment='center', verticalalignment='center', bbox=bbox_props)
+
+    plt.tight_layout()
+    plt.legend(['controls', 'SRs', 'significant w/o correction'])
     plt.xlabel('frequency')
     plt.ylabel("classifier sensitivity d'")
-
-    plt.ylim([-0.4, 2])
 
     plt.tight_layout()
     plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_3_' + conditions[i] + '.jpg'), dpi=500)
 
 # Plot individual subject data
+pl_colors = ['r', 'b']
 plt.figure(figsize=(18*cm, 18*cm))
-plt.suptitle('Experiment 3 - 3')
-for id_ in range(18, 26):
+plt.suptitle('Experiment 3 - 2')
+for id_ in range(9, 14):
+    for k in range(len(conditions)):
+        # results from experiment
+        results = list(filter(lambda s: 'experiment_3' + conditions[k] + '.npy' in s, os.listdir(results_dir)))
+        rlp = list(filter(lambda s: 'experiment_3' + conditions[k] + 'rlp' in s, os.listdir(results_dir)))
 
-    subj = results[id_]
-    subj_id = subj.replace('_experiment_3.npy', '')
-    data_ = np.load(os.path.join(results_dir, subj))
-    rlp_ = np.load(os.path.join(results_dir, rlp[id_]))
-    group_ = demog_file.loc[subj_id].Label
+        subj = results[id_]
+        subj_id = subj.replace('_experiment_3' + conditions[k] + '.npy', '')
+        data_ = np.load(os.path.join(results_dir, subj))
+        rlp_ = np.load(os.path.join(results_dir, rlp[id_]))
+        group_ = demog_file.loc[subj_id].Label
 
-    for j in range(len(conditions)):
         if id_ < 9:
             id_pl = id_
         elif id_ < 18:
             id_pl = id_ - 9
         else:
             id_pl = id_ - 18
+
         plt.subplot(3, 3, id_pl + 1)
         # true data
-        prc_ = np.percentile(data_[:, j, :], (25, 50, 75), axis=0)
+        prc_ = np.percentile(data_[:, 0, :], (25, 50, 75), axis=0)
         prc_[0] = prc_[1] - prc_[0]
         prc_[2] = prc_[2] - prc_[1]
-        plt.scatter(freq_vector + 1, prc_[1], s=5, c=pl_colors[j])
-        plt.errorbar(freq_vector + 1, prc_[1], yerr=prc_[[0, 2]], capsize=2, color=pl_colors[j], elinewidth=0.5, linewidth=0.7)
+        plt.scatter(freq_vector + 1, prc_[1], s=5, c=pl_colors[k])
+        plt.errorbar(freq_vector + 1, prc_[1], yerr=prc_[[0, 2]], capsize=2, color=pl_colors[k], elinewidth=0.5,
+                     linewidth=0.7)
         # perm data
         if plot_perm == 1:
-            prc_ = np.percentile(rlp_[:, j, :], (25, 50, 75), axis=0)
+            prc_ = np.percentile(rlp_[:, 0, :], (25, 50, 75), axis=0)
             prc_[0] = prc_[1] - prc_[0]
             prc_[2] = prc_[2] - prc_[1]
             plt.scatter(freq_vector + 1, prc_[1], s=5, c=pl_colors[j])
             plt.errorbar(freq_vector + 1, prc_[1], yerr=prc_[[0, 2]], capsize=2, color=pl_colors[j], elinewidth=0.5, linewidth=0.7)
-
         plt.ylabel("d'")
         plt.xlabel('frequency')
         plt.ylim([-0.5, 3])
@@ -145,8 +169,8 @@ for id_ in range(18, 26):
 
         plt.text(-0.5, 2.5, g_id)
 
-    plt.legend(conditions, loc="upper right", ncol=1, fontsize=7)
+    plt.legend(['10100 vs 20100', '1050 vs 10100'], loc="upper right", ncol=1, fontsize=7)
 
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.3, hspace=0.3)
-plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_3_' + 'subj_19-26' + '.jpg'), dpi=500)
+plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_3_' + 'subj_10-14' + '.jpg'), dpi=500)

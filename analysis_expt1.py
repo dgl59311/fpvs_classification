@@ -31,7 +31,7 @@ results = list(filter(lambda s: 'experiment_1.npy' in s, os.listdir(results_dir)
 rlp = list(filter(lambda s: 'experiment_1rlp' in s, os.listdir(results_dir)))
 sdt = list(filter(lambda s: 'experiment_1tp_fp_fn_tn' in s, os.listdir(results_dir)))
 
-for id_ in range(26):
+for id_ in range(14):
 
     subj = results[id_]
     subj_id = subj.replace('_experiment_1.npy', '')
@@ -104,7 +104,7 @@ for i in range(len(conditions)):
 # Plot individual subject data
 plt.figure(figsize=(18*cm, 18*cm))
 plt.suptitle('Experiment 1 - 2')
-for id_ in range(9, 18):
+for id_ in range(9, 14):
 
     subj = results[id_]
     subj_id = subj.replace('_experiment_1.npy', '')
@@ -149,4 +149,4 @@ for id_ in range(9, 18):
 
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.3, hspace=0.3)
-plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_1_' + 'subj_10-18' + '.jpg'), dpi=500)
+plt.savefig(os.path.join(main_dir, 'results', 'figures', 'Experiment_1_' + 'subj_10-14' + '.jpg'), dpi=500)

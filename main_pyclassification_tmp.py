@@ -28,25 +28,15 @@ random_sp = StratifiedShuffleSplit(n_splits=repeat_n, test_size=0.25, random_sta
 random_sp_rlp = StratifiedShuffleSplit(n_splits=1, test_size=0.25, random_state=234)
 
 # classification model
-# In OnevsOne the class that received most votes is selected
-clf_model_mc = Pipeline(steps=[('scale', StandardScaler()),
-                               ('pca', PCA(n_components=20)),
-                               ('clf_model', OneVsOneClassifier(LogisticRegressionCV(Cs=np.logspace(-5, 5, 30),
-                                                                                     penalty='l1',
-                                                                                     max_iter=200,
-                                                                                     cv=5,
-                                                                                     tol=1e-3,
-                                                                                     solver='liblinear',
-                                                                                     n_jobs=-1)))])
-clf_model_bin = Pipeline(steps=[('scale', StandardScaler()),
-                                ('pca', PCA(n_components=20)),
-                                ('clf_model', LogisticRegressionCV(Cs=np.logspace(-5, 5, 30),
-                                                                   penalty='l1',
-                                                                   max_iter=200,
-                                                                   cv=5,
-                                                                   tol=1e-3,
-                                                                   solver='liblinear',
-                                                                   n_jobs=-1))])
+clf_model = Pipeline(steps=[('scale', StandardScaler()),
+                            ('pca', PCA(n_components=20)),
+                            ('clf_model', LogisticRegressionCV(Cs=np.logspace(-5, 5, 30),
+                                                               penalty='l1',
+                                                               max_iter=200,
+                                                               cv=10,
+                                                               tol=1e-3,
+                                                               solver='liblinear',
+                                                               n_jobs=-1))])
 
 # frequencies to analyze
 freq_vector = np.arange(0, 257, 1)
@@ -54,33 +44,37 @@ freq_vector = freq_vector[freq_vector < 48]
 
 # read demog file
 demog_file = pd.read_csv('SR_Testing_FPVS.csv', index_col=0)
+demog_file = demog_file[(demog_file['Label'] == 'Control') | (demog_file['Label'] == 'SR1')]
 
 # Select which experiment to run
-# 1: Identity oddball
-# 2: Category selectivity
-# 3: Duty Cycle
-for expt in range(3, 4):
+# 1: model for Category selectivity
+# 2: model for Duty Cycle - 10Hz050 vs 10Hz100
+# 3: model for Duty Cycle - 10Hz100 vs 20Hz100
+
+for model_ in range(1, 3):
+    if model_ == 0:
+        expt = 2
+        id_files = '_experiment_2'
+    elif model_ == 1:
+        expt = 3
+        id_files = '_experiment_3_1050vs10100'
+    else:
+        expt = 3
+        id_files = '_experiment_3_10100vs20100'
 
     print('Runnin code for experiment: ', expt)
-    conditions, clf_files_local, id_files = experiment_info(expt)
+    conditions, clf_files_local, _fname_ = experiment_info(expt)
     files_ = data_check(conditions, clf_files_local)
+    files_ = files_[files_.index.isin(demog_file.index)]
     participants = files_.index
-    participants = participants[9:]
-
-    if len(conditions) > 2:
-        clf_model = clf_model_mc
-        print('Multiclass classification')
-    else:
-        clf_model = clf_model_bin
-        print('Binary classification')
 
     # start loop
     for i in tqdm(range(len(participants))):
         eeg_data = []
         cat_labels = []
-        d_clf = np.zeros((repeat_n, len(conditions), len(freq_vector)))
-        sdt_clf = np.zeros((repeat_n, len(conditions), 4, len(freq_vector)))
-        d_clf_rlp = np.zeros((repeat_n, len(conditions), len(freq_vector)))
+        d_clf = np.zeros((repeat_n, 2, len(freq_vector)))
+        sdt_clf = np.zeros((repeat_n, 2, 4, len(freq_vector)))
+        d_clf_rlp = np.zeros((repeat_n, 2, len(freq_vector)))
         for j in range(len(conditions)):
             loc_files = files_.loc[participants[i]]
             # load data for each condition
@@ -95,6 +89,16 @@ for expt in range(3, 4):
         # transpose dimensions to trials x electrodes x frequencies
         eeg_data = np.transpose(np.squeeze(eeg_data), (2, 1, 0))
         cat_labels = np.concatenate(cat_labels)
+
+        if model_ == 1:
+            # this model corresponds to 10Hz050 vs 10Hz100
+            eeg_data = eeg_data[cat_labels != 2, :, :]
+            cat_labels = cat_labels[cat_labels != 2]
+        elif model_ == 2:
+            # this model corresponds to 10Hz100 vs 20Hz100
+            eeg_data = eeg_data[cat_labels != 0, :, :]
+            cat_labels = cat_labels[cat_labels != 0]
+
         # for "true" data
         rep_ = 0
         for train_i, test_i in random_sp.split(eeg_data, cat_labels):
