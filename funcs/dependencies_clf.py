@@ -25,6 +25,28 @@ def experiment_info(id_experiment):
     return conditions, dir_files, id_files
 
 
+def clf_id(model):
+    if model == 0:
+        expt = 1
+        id_files = '_experiment_1_6vs3'
+    elif model == 1:
+        expt = 1
+        id_files = '_experiment_1_6vs9'
+    elif model == 2:
+        expt = 1
+        id_files = '_experiment_1_6vs12'
+    elif model == 3:
+        expt = 2
+        id_files = '_experiment_2'
+    elif model == 4:
+        expt = 3
+        id_files = '_experiment_3_1050vs10100'
+    elif model == 5:
+        expt = 3
+        id_files = '_experiment_3_10100vs20100'
+    return expt, id_files
+
+
 def data_check(conditions, folder):
     # the output is a dataframe with the name of the participant and the location of the data for each condition
     for i in range(len(conditions)):
@@ -112,3 +134,39 @@ def clf_fpvs(train_index, test_index, model, data_x, data_y, freq):
             d_primes[0, i] = dprime_clf(tp, fp, fn, tn)
 
     return results_, d_primes
+
+
+def bin_clf_fpvs(train_index, test_index, model, data_x, data_y, freq):
+    eeg_train = data_x[train_index]
+    cat_train = data_y[train_index]
+    eeg_test = data_x[test_index]
+    cat_test = data_y[test_index]
+    results_ = np.zeros((4, len(freq)))
+    d_primes = np.zeros(len(freq))
+    for i in range(len(freq)):
+        freq_ = freq[i]
+        freq_train = eeg_train[:, :, freq_]
+        freq_test = eeg_test[:, :, freq_]
+        # fit classifier on train data with cross-validation
+        internal_clf = clone(model)
+        fit_model = internal_clf.fit(freq_train, cat_train)
+        prediction_ = fit_model.predict(freq_test)
+
+        tn, fp, fn, tp = confusion_matrix(cat_test, prediction_).ravel()
+        results_[0, i] = tn
+        results_[1, i] = fp
+        results_[2, i] = fn
+        results_[3, i] = tp
+        d_primes[i] = dprime_clf(tp, fp, fn, tn)
+
+    return results_, d_primes
+
+
+def cohen_d(x, y):
+    mean1 = np.mean(x)
+    mean2 = np.mean(y)
+    std1 = np.std(x, ddof=1)
+    std2 = np.std(y, ddof=1)
+    pooled_std = np.sqrt(((len(x) - 1) * std1 ** 2 + (len(y) - 1) * std2 ** 2) / (len(x) + len(y) - 2))
+    cohen_d = (mean1 - mean2) / pooled_std
+    return cohen_d
