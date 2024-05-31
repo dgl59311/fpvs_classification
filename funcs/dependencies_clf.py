@@ -1,10 +1,6 @@
 import os
 import pandas as pd
 import scipy.io as sio
-import scipy.stats as stats
-import numpy as np
-from sklearn.metrics import confusion_matrix
-from sklearn.base import clone
 
 
 def experiment_info(id_experiment):
@@ -23,28 +19,6 @@ def experiment_info(id_experiment):
         dir_files = "C:/Users/gordillo/Desktop/local_fpvs/Experiment 3"
         id_files = '_experiment_3'
     return conditions, dir_files, id_files
-
-
-def clf_id(model):
-    if model == 0:
-        expt = 1
-        id_files = '_experiment_1_6vs3'
-    elif model == 1:
-        expt = 1
-        id_files = '_experiment_1_6vs9'
-    elif model == 2:
-        expt = 1
-        id_files = '_experiment_1_6vs12'
-    elif model == 3:
-        expt = 2
-        id_files = '_experiment_2'
-    elif model == 4:
-        expt = 3
-        id_files = '_experiment_3_1050vs10100'
-    elif model == 5:
-        expt = 3
-        id_files = '_experiment_3_10100vs20100'
-    return expt, id_files
 
 
 def data_check(conditions, folder):
@@ -70,103 +44,32 @@ def find_headers(matfilepath):
     xstart = header['xstart'].item()[0][0]
     xstep = header['xstep'].item()[0][0]
     xlen = header['datasize'].item()[0][5]
+    # header['chanlocs']
     return epochs, xstart, xstep, xlen
 
 
-def sdt_multinomial(confusion_mat):
-
-    num_classes = confusion_mat.shape[0]
-    sdt_values = np.zeros((num_classes, 4))
-
-    for i in range(num_classes):
-
-        tp = confusion_mat[i, i]
-        fp = np.sum(confusion_mat[:, i]) - tp
-        fn = np.sum(confusion_mat[i, :]) - tp
-        tn = np.sum(confusion_mat) - (tp + fp + fn)
-
-        sdt_values[i, 0] = tp
-        sdt_values[i, 1] = fp
-        sdt_values[i, 2] = fn
-        sdt_values[i, 3] = tn
-
-    return sdt_values
-
-
-def dprime_clf(tp, fp, fn, tn):
-
-    # loglinear dprime
-    H = (tp + 0.5) / (tp + fn + 1)
-    FA = (fp + 0.5) / (fp + tn + 1)
-
-    Z_H = stats.norm.ppf(H)
-    Z_FA = stats.norm.ppf(FA)
-    d_prime = Z_H - Z_FA
-
-    return d_prime
+# Function to map Bayes factor to qualitative evidence log
+def interpret_bayes_factor_log(bf):
+    bf = float(bf)
+    if bf < -2:
+        return "Decisive (null)"
+    elif -2 <= bf < -1.5:
+        return "Strong 2 (null)"
+    elif -1.5 <= bf < -1:
+        return "Strong (null)"
+    elif -1 <= bf < -0.5:
+        return "Substantial (null)"
+    elif -0.5 <= bf < 0.5:
+        return "Barely worth mentioning"
+    elif 0.5 <= bf < 1:
+        return "Substantial"
+    elif 1 <= bf < 1.5:
+        return "Strong"
+    elif 1.5 <= bf < 2:
+        return "Strong 2"
+    else:  # bf >= 100
+        return "Decisive"
 
 
-def clf_fpvs(train_index, test_index, model, data_x, data_y, freq):
-    eeg_train = data_x[train_index]
-    cat_train = data_y[train_index]
-    eeg_test = data_x[test_index]
-    cat_test = data_y[test_index]
-    n_cat = len(np.unique(data_y))
-    results_ = np.zeros((n_cat, 4, len(freq)))
-    d_primes = np.zeros((n_cat, len(freq)))
-    for i in range(len(freq)):
-        freq_ = freq[i]
-        freq_train = eeg_train[:, :, freq_]
-        freq_test = eeg_test[:, :, freq_]
-        # fit classifier on train data with cross-validation
-        internal_clf = clone(model)
-        fit_model = internal_clf.fit(freq_train, cat_train)
-        prediction_ = fit_model.predict(freq_test)
-        if n_cat > 2:
-            conf_mat = confusion_matrix(cat_test, prediction_)
-            # gives a matrix of category x sdt measure (TP, FP, FN, TN)
-            sdt_ = sdt_multinomial(conf_mat)
-            results_[:, :, i] = sdt_
-            for j in range(n_cat):
-                d_primes[j, i] = dprime_clf(sdt_[j, 0], sdt_[j, 1], sdt_[j, 2], sdt_[j, 3])
-        else:
-            tn, fp, fn, tp = confusion_matrix(cat_test, prediction_).ravel()
-            d_primes[0, i] = dprime_clf(tp, fp, fn, tn)
-
-    return results_, d_primes
 
 
-def bin_clf_fpvs(train_index, test_index, model, data_x, data_y, freq):
-    eeg_train = data_x[train_index]
-    cat_train = data_y[train_index]
-    eeg_test = data_x[test_index]
-    cat_test = data_y[test_index]
-    results_ = np.zeros((4, len(freq)))
-    d_primes = np.zeros(len(freq))
-    for i in range(len(freq)):
-        freq_ = freq[i]
-        freq_train = eeg_train[:, :, freq_]
-        freq_test = eeg_test[:, :, freq_]
-        # fit classifier on train data with cross-validation
-        internal_clf = clone(model)
-        fit_model = internal_clf.fit(freq_train, cat_train)
-        prediction_ = fit_model.predict(freq_test)
-
-        tn, fp, fn, tp = confusion_matrix(cat_test, prediction_).ravel()
-        results_[0, i] = tn
-        results_[1, i] = fp
-        results_[2, i] = fn
-        results_[3, i] = tp
-        d_primes[i] = dprime_clf(tp, fp, fn, tn)
-
-    return results_, d_primes
-
-
-def cohen_d(x, y):
-    mean1 = np.mean(x)
-    mean2 = np.mean(y)
-    std1 = np.std(x, ddof=1)
-    std2 = np.std(y, ddof=1)
-    pooled_std = np.sqrt(((len(x) - 1) * std1 ** 2 + (len(y) - 1) * std2 ** 2) / (len(x) + len(y) - 2))
-    cohen_d = (mean1 - mean2) / pooled_std
-    return cohen_d
