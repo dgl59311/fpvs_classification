@@ -35,7 +35,7 @@ clf_model = Pipeline(steps=[('var', VarianceThreshold()),
 
 # frequencies to analyze
 freq_vector = np.arange(0, 257, 1)
-freq_vector = freq_vector[freq_vector < 48]
+freq_vector = freq_vector[freq_vector < 49]
 
 # read demog file
 demog_file = pd.read_csv('SR_Testing_FPVS.csv', index_col=0)
@@ -93,5 +93,5 @@ for i in tqdm(range(len(participants))):
     # save data
     np.save(os.path.join(main_dir, 'results', 'classification_data', participants[i] + '_f1_expt_2.npy'), f1_clf)
     np.save(os.path.join(main_dir, 'results', 'classification_data', participants[i] + '_acc_expt_2.npy'), acc_clf)
-    np.save(os.path.join(main_dir, 'results', 'classification_data', participants[i] + '_expt_2_tp_fp_fn_tn.npy'), sdt_clf)
+    np.save(os.path.join(main_dir, 'results', 'classification_data', participants[i] + '_conf_mat_expt_2.npy'), sdt_clf)
 

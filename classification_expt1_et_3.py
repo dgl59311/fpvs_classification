@@ -42,7 +42,7 @@ clf_model_ovo = OneVsOneClassifier(clf_model, n_jobs=-1)
 # frequencies to analyze
 freq_vector = np.arange(0, 257, 1)
 # only analyze frequencies below 48 Hz / had to be 49
-freq_vector = freq_vector[freq_vector < 48]
+freq_vector = freq_vector[freq_vector < 49]
 
 # read demog file
 demog_file = pd.read_csv('SR_Testing_FPVS.csv', index_col=0)
